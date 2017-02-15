@@ -1,0 +1,120 @@
+﻿@model ContactList.Models.Contact
+
+@{
+    ViewBag.Title = "Details";
+}
+<script src="http://maps.google.com/maps/api/js?key=AIzaSyC1T1b15_1RYaNAx-EkfSpTgmFf4VDUrNY" type="text/javascript"></script>
+<h2>Details</h2>
+
+<div>
+
+    <p>
+        @Html.ActionLink("Edit", "Edit", new { id = Model.ID }) |
+        @Html.ActionLink("Back to List", "Index")
+    </p>
+
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.FirstName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.FirstName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.LastName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.LastName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Adress)
+        </dt>
+
+        <dd id = "AdressField">
+            @Html.DisplayFor(model => model.Adress)
+        </dd>
+
+
+        <dt>
+            @Html.DisplayNameFor(model => model.PhoneNumbers)
+        </dt>
+        <dd>
+
+            <table class="table">
+                <tr>
+                    <th>Type</th>
+                    <th>Number</th>
+                </tr>
+                @foreach (var item in Model.PhoneNumbers)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Type)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.number)
+                        </td>
+                    </tr>
+                }
+            </table>
+        </dd>
+
+
+    </dl>
+</div>
+
+
+
+<div id="map_canvas" style="height: 550px;"></div>
+
+<!-- Enclose the Javascript in a "section" so that it is rendered in the correct order after scripts have been loaded etc -->
+@section scripts {
+    <section class="scripts">
+
+        <script type="text/javascript">
+
+
+            var geocoder;
+            var map;
+
+            $(document).ready(function () {
+                if (document.getElementById("AdressField").innerText.length > 0)
+                {
+                    InitializeMap();
+                }
+            });
+
+            function InitializeMap() {
+                geocoder = new google.maps.Geocoder();
+                var latlng = new google.maps.LatLng(-34.397, 150.644);
+                var mapOptions = {
+                    zoom: 8,
+                    center: latlng
+                }
+                map = new google.maps.Map(document.getElementById('map_canvas'), mapOptions);
+                codeAddress();
+
+            }
+
+            function codeAddress() {
+                var address = document.getElementById('AdressField').innerText;
+                geocoder.geocode({ 'address': address }, function (results, status) {
+                    if (status == google.maps.GeocoderStatus.OK) {
+                        map.setCenter(results[0].geometry.location);
+                        var marker = new google.maps.Marker({
+                            map: map,
+                            position: results[0].geometry.location
+                        });
+                    } else {
+                        alert('Geocode was not successful for the following reason: ' + status);
+                    }
+                });
+            }
+        </script>
+    </section>
+    }
